@@ -2,35 +2,41 @@ import numpy as np
 import cv2 as cv
 import glob
 
-CHECKERBOARD = (7,5)
+CHECKERBOARD = (7,7)
+# CHECKERBOARD = (7,5)
 
-# termination criteria
+image_height = 0
+image_width = 0
+
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
-# prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
 objp = np.zeros((CHECKERBOARD[0]*CHECKERBOARD[1],3), np.float32)
 objp[:,:2] = np.mgrid[0:CHECKERBOARD[0],0:CHECKERBOARD[1]].T.reshape(-1,2)
+objpoints = [] 
+imgpoints = []
 
-# Arrays to store object points and image points from all the images.
-objpoints = [] # 3d point in real world space
-imgpoints = [] # 2d points in image plane.
-images = glob.glob('./photos/*.jpg')
+directory = './Teste3/'
+
+images = glob.glob(directory + '*.jpg')
 
 for fname in images:
     img = cv.imread(fname)
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
-    # Find the chess board corners
+    image_height, image_width = img.shape[:2]
+
+    # Busca os cantos do tabuleiro
     ret, corners = cv.findChessboardCorners(gray, CHECKERBOARD, None)
 
-    # If found, add object points, image points (after refining them)
+    # Se for encontrado, refina os pontos e em imgpoints
     if ret == True:
         objpoints.append(objp)
         corners2 = cv.cornerSubPix(gray,corners, (11,11), (-1,-1), criteria)
         imgpoints.append(corners2)
         
-        # Draw and display the corners
+        # Exibe resultado
         cv.drawChessboardCorners(img, CHECKERBOARD, corners2, ret)
+        cv.imwrite('resultado_parcial.png', img)
         cv.imshow('img', img)
         cv.waitKey(500)
 
@@ -48,14 +54,18 @@ print(rvecs)
 print("tvecs : \n")
 print(tvecs)
 
-# Exemplo
-img = cv.imread('./photos/2023-04-29-222252.jpg')
-h,  w = img.shape[:2]
-newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
 
-# undistort
-dst = cv.undistort(img, mtx, dist, None, newcameramtx)
-# crop the image
-x, y, w, h = roi
-dst = dst[y:y+h, x:x+w]
-cv.imwrite('resultado.png', dst)
+# Calcula nova matriz e aplica na imagem
+newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (image_width,image_height), 1, (image_width,image_height))
+
+for fname in images:
+    img = cv.imread(fname)
+    gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+    # Desfaz distorção
+    dst = cv.undistort(img, mtx, dist, None, newcameramtx)
+    
+    # Corta a imagem e salva resultado
+    x, y, w, h = roi
+    dst = dst[y:y+h, x:x+w]
+    cv.imwrite((fname + '_resultado_' + '.png'), dst)

@@ -2,11 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from sklearn import datasets
 from sklearn.model_selection import train_test_split , KFold
 from sklearn.preprocessing import Normalizer
 from sklearn.metrics import accuracy_score
-from sklearn.neighbors import KNeighborsClassifier
 
 from collections import Counter
 

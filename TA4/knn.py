@@ -40,7 +40,7 @@ def KNN_from_scratch(x_train, y_train, x_test, K):
       y_pred_point    = voting(df_nearest_point, y_train)
       y_pred.append(y_pred_point)
 
-    return y_pred  
+    return y_pred
 
 # Carregar o dataset em um DataFrame
 iris_df = pd.read_csv('iris.data', names=['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'class'])

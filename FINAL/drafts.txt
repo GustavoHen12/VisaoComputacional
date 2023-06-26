@@ -1,0 +1,7 @@
+> https://vinayak96.github.io/people_detection/
+
+> Dataset: https://www.kaggle.com/datasets/constantinwerner/human-detection-dataset
+
+> https://arxiv.org/abs/1506.01497
+
+> https://universe.roboflow.com/mohamed-traore-2ekkp/people-detection-general/dataset/8

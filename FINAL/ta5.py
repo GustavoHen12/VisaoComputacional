@@ -33,7 +33,7 @@ cv2.namedWindow('croped', cv2.WINDOW_NORMAL)
 cv2.namedWindow('yolo_output', cv2.WINDOW_NORMAL)
 
 # Load the video
-video = cv2.VideoCapture("./images/video_test2.mp4")
+video = cv2.VideoCapture("./images/video_test3.mp4")
 frame_count = 0
 while True:
     ret, frame = video.read()
@@ -47,10 +47,9 @@ while True:
 
     # Process area in the image with a person
     interestArea = getImageInterestArea(frame, results)
-
-    getPersonPosition(frame, model_pose_estimation)
+    position = getPersonPosition(frame, model_pose_estimation)
     
-    # if interestArea != None:
+    # if  interestArea[0] != None:
     #     position = getPersonPosition(interestArea[0], model_pose_estimation)
         
     

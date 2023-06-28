@@ -13,7 +13,7 @@ yolov5_dir = Path("./yolov5")
 
 # Load the YOLOv5 model for object detection
 model = torch.hub.load(str(yolov5_dir), "custom", path=str(yolov5_dir / "yolov5s.pt"), source="local")
-model.conf = 0.4
+model.conf = 0.6
 
 # Set the device (CPU or GPU)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -33,7 +33,7 @@ cv2.namedWindow('croped', cv2.WINDOW_NORMAL)
 cv2.namedWindow('yolo_output', cv2.WINDOW_NORMAL)
 
 # Load the video
-video = cv2.VideoCapture("./images/video_test3.mp4")
+video = cv2.VideoCapture("./images/video_test.mp4")
 frame_count = 0
 while True:
     ret, frame = video.read()

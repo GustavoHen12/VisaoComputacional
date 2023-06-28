@@ -6,12 +6,10 @@ import matplotlib.pyplot as plt
 from torchvision import transforms as T
 import math
 
-# create the list of keypoints.
+keypoints_index = ['nose','left_eye','right_eye','left_ear','right_ear','left_shoulder','right_shoulder','left_elbow', 'right_elbow','left_wrist','right_wrist','left_hip','right_hip','left_knee', 'right_knee', 'left_ankle','right_ankle']
 
 def draw_keypoints_per_person(img, all_keypoints, all_scores, confs, keypoint_threshold=2, conf_threshold=0.9):
-    # initialize a set of colors from the rainbow spectrum
     cmap = plt.get_cmap('rainbow')
-    # create a copy of the image
     img_copy = img.copy()
     # pick a set of N color-ids from the spectrum
     color_id = np.arange(1,255, 255//len(all_keypoints)).tolist()[::-1]
@@ -25,36 +23,52 @@ def draw_keypoints_per_person(img, all_keypoints, all_scores, confs, keypoint_th
         scores = all_scores[person_id, ...]
         # iterate for every keypoint-score
         for kp in range(len(scores)):
-            # check the confidence score of detected keypoint
             if scores[kp]>keypoint_threshold:
-                # convert the keypoint float-array to a python-list of intergers
                 keypoint = tuple(map(int, keypoints[kp, :2].detach().numpy().tolist()))
-                # pick the color at the specific color-id
-                color = tuple(np.asarray(cmap(color_id[person_id])[:-1])*255)
-                # draw a cirle over the keypoint location
+                color = None
+                if(kp == keypoints_index.index('right_knee') or kp == keypoints_index.index('left_knee')):
+                    color = (0, 0, 255)
+                elif (kp == keypoints_index.index('right_shoulder') or kp == keypoints_index.index('left_shoulder')):
+                    color = (0, 255, 0)
+                elif (kp == keypoints_index.index('right_hip') or kp == keypoints_index.index('left_hip')):
+                    color = (0, 255, 0)
+                else:
+                    color = tuple(np.asarray(cmap(color_id[person_id])[:-1])*255)
                 cv2.circle(img_copy, keypoint, 5, color, -1)
 
     return img_copy
 
 def calcular_angulos(hx, hy, sx, sy, kx, ky):
-    sk = math.sqrt((sx - kx) ** 2 + (sy - ky) ** 2)
-    hk = math.sqrt((hx - kx) ** 2 + (hy - ky) ** 2)
-    hs = math.sqrt((hx - sx) ** 2 + (hy - sy) ** 2)
+    if(kx == -1 or ky == -1):
+        return "sentado"
+    if(sx == -1 or sy == -1 or hy == -1 or hx == -1):
+        return "em pe"
 
-    if sk < hs:
-       return "sentado"
+    sk = math.sqrt((sx - kx) * 2 + (sy - ky) * 2)
+    hk = math.sqrt((hx - kx) * 2 + (hy - ky) * 2)
+    hs = math.sqrt((hx - sx) * 2 + (hy - sy) * 2)
     
-    angulo_a = math.degrees(math.acos((hk ** 2 + hs ** 2 - sk ** 2) / (2 * hk * hs)))
-    angulo_b = math.degrees(math.acos((sk ** 2 + hs ** 2 - hk ** 2) / (2 * sk * hs)))
-    angulo_c = math.degrees(math.acos((sk ** 2 + hk ** 2 - hs ** 2) / (2 * sk * hk)))
+    print((hk * 2 + hs * 2 - sk ** 2) / (2 * hk * hs))
+    print((sk * 2 + hs * 2 - hk ** 2) / (2 * sk * hs))
+    print((sk * 2 + hk * 2 - hs ** 2) / (2 * sk * hk))
 
-    if int(angulo_b) <= 60:
+    angulo_a = math.degrees(math.acos((hk * 2 + hs * 2 - sk ** 2) / (2 * hk * hs)))
+    angulo_b = math.degrees(math.acos((sk * 2 + hs * 2 - hk ** 2) / (2 * sk * hs)))
+    angulo_c = math.degrees(math.acos((sk * 2 + hk * 2 - hs ** 2) / (2 * sk * hk)))
+
+    if int(angulo_b) <= 45:
        return "sentado"
 
     return "em pe"
 
+def getKeypoint(keypoints, scores, point, keypoint_threshold=2):
+    keypoint = keypoints[keypoints_index.index(point), :2].detach().numpy().astype(np.int32)
+    score = scores[keypoints_index.index(point)]
+    if score > keypoint_threshold:
+        return keypoint
+    return (-1, -1)
+
 def get_pose_estimated(img, all_keypoints, all_scores, confs, keypoint_threshold=2, conf_threshold=0.9):
-    keypoints_index = ['nose','left_eye','right_eye','left_ear','right_ear','left_shoulder','right_shoulder','left_elbow', 'right_elbow','left_wrist','right_wrist','left_hip','right_hip','left_knee', 'right_knee', 'left_ankle','right_ankle']
     
     ## Tenta formar um triangulo entre o ombro, bacia e joelho
     for person_id in range(len(all_keypoints)):
@@ -63,15 +77,15 @@ def get_pose_estimated(img, all_keypoints, all_scores, confs, keypoint_threshold
         scores = all_scores[person_id, ...]
         print(keypoints)
         print("Right:")
-        right_hip = keypoints[keypoints_index.index('right_hip'), :2].detach().numpy().astype(np.int32)
-        right_shoulder = keypoints[keypoints_index.index('right_shoulder'), :2].detach().numpy().astype(np.int32)
-        right_knee = keypoints[keypoints_index.index('right_knee'), :2].detach().numpy().astype(np.int32)
+        right_hip = getKeypoint(keypoints, scores, 'right_hip', keypoint_threshold)
+        right_shoulder = getKeypoint(keypoints, scores, 'right_shoulder', keypoint_threshold)
+        right_knee = getKeypoint(keypoints, scores, 'right_knee', keypoint_threshold)
         print(calcular_angulos(right_hip[0], right_hip[1], right_shoulder[0], right_shoulder[1], right_knee[0], right_knee[1]))    
 
         print("Left:")
-        left_hip = keypoints[keypoints_index.index('left_hip'), :2].detach().numpy().astype(np.int32)
-        left_shoulder = keypoints[keypoints_index.index('left_shoulder'), :2].detach().numpy().astype(np.int32)
-        left_knee = keypoints[keypoints_index.index('left_knee'), :2].detach().numpy().astype(np.int32)
+        left_hip = getKeypoint(keypoints, scores, 'left_hip', keypoint_threshold)
+        left_shoulder = getKeypoint(keypoints, scores, 'left_shoulder', keypoint_threshold)
+        left_knee = getKeypoint(keypoints, scores, 'left_knee', keypoint_threshold)
         print(calcular_angulos(left_hip[0], left_hip[1], left_shoulder[0], left_shoulder[1], left_knee[0], left_knee[1]))    
 
     return "sentado"

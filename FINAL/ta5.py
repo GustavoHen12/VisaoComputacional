@@ -24,7 +24,7 @@ model.to(device).eval()
 model_pose_estimation = torchvision.models.detection.keypointrcnn_resnet50_fpn(pretrained=True)
 model_pose_estimation.eval()
 
-# img = cv2.imread('./images/image_1.jpg')
+# img = cv2.imread('./images/jsent.png')
 # getPersonPosition(img, model_pose_estimation)
 # cv2.waitKey(500)
 
@@ -33,7 +33,7 @@ cv2.namedWindow('croped', cv2.WINDOW_NORMAL)
 cv2.namedWindow('yolo_output', cv2.WINDOW_NORMAL)
 
 # Load the video
-video = cv2.VideoCapture("./images/video_test.mp4")
+video = cv2.VideoCapture("./images/video_test4.mp4")
 frame_count = 0
 while True:
     ret, frame = video.read()

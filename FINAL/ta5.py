@@ -24,7 +24,7 @@ model.to(device).eval()
 model_pose_estimation = torchvision.models.detection.keypointrcnn_resnet50_fpn(pretrained=True)
 model_pose_estimation.eval()
 
-# img = cv2.imread('./images/image_1.jpg')
+# img = cv2.imread('./images/jsent.png')
 # getPersonPosition(img, model_pose_estimation)
 # cv2.waitKey(500)
 

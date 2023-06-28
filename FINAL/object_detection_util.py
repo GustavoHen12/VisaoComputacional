@@ -29,38 +29,39 @@ def getImageInterestArea(image, result):
     objects_x2 = [person_x2]
     objects_y2 = [person_y2]
     for index, row in pd.iterrows():
-        x1 = int(row["xmin"])
-        y1 = int(row["ymin"])
-        x2 = int(row["xmax"])
-        y2 = int(row["ymax"])
-        heigth = y2  - y1
-        width = x2 - x1
+        if row["class"] != 0:
+            x1 = int(row["xmin"])
+            y1 = int(row["ymin"])
+            x2 = int(row["xmax"])
+            y2 = int(row["ymax"])
+            heigth = y2  - y1
+            width = x2 - x1
 
-        # Se existe um ponto do objeto no interior da area de interesse
-        if (isInside(x1, y1, person_x1, person_y1, person_x2, person_y2)):
-            objects_x1.append(x1)
-            objects_y1.append(y1)
-            objects_x2.append(x2)
-            objects_y2.append(y2)
-            objects.append(row["name"])
-        elif (isInside(x2, y2, person_x1, person_y1, person_x2, person_y2)):
-            objects_x1.append(x1)
-            objects_y1.append(y1)
-            objects_x2.append(x2)
-            objects_y2.append(y2)
-            objects.append(row["name"])
-        elif (isInside((x1+width), y1, person_x1, person_y1, person_x2, person_y2)):
-            objects_x1.append(x1)
-            objects_y1.append(y1)
-            objects_x2.append(x2)
-            objects_y2.append(y2)
-            objects.append(row["name"])
-        elif (isInside(x1, (y2+heigth), person_x1, person_y1, person_x2, person_y2)):
-            objects_x1.append(x1)
-            objects_y1.append(y1)
-            objects_x2.append(x2)
-            objects_y2.append(y2)
-            objects.append(row["name"])
+            # Se existe um ponto do objeto no interior da area de interesse
+            if (isInside(x1, y1, person_x1, person_y1, person_x2, person_y2)):
+                objects_x1.append(x1)
+                objects_y1.append(y1)
+                objects_x2.append(x2)
+                objects_y2.append(y2)
+                objects.append(row["name"])
+            elif (isInside(x2, y2, person_x1, person_y1, person_x2, person_y2)):
+                objects_x1.append(x1)
+                objects_y1.append(y1)
+                objects_x2.append(x2)
+                objects_y2.append(y2)
+                objects.append(row["name"])
+            elif (isInside((x1+width), y1, person_x1, person_y1, person_x2, person_y2)):
+                objects_x1.append(x1)
+                objects_y1.append(y1)
+                objects_x2.append(x2)
+                objects_y2.append(y2)
+                objects.append(row["name"])
+            elif (isInside(x1, (y2+heigth), person_x1, person_y1, person_x2, person_y2)):
+                objects_x1.append(x1)
+                objects_y1.append(y1)
+                objects_x2.append(x2)
+                objects_y2.append(y2)
+                objects.append(row["name"])
 
     # Recorta a area que possue todos os objetos de interesse
     cropped_image = image[min(objects_y1):max(objects_y2), min(objects_x1):max(objects_x2)]    

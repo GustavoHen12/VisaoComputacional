@@ -39,7 +39,21 @@ def draw_keypoints_per_person(img, all_keypoints, all_scores, confs, keypoint_th
                     color = (255, 255, 255)
                 cv2.circle(img_copy, keypoint, 5, color, -1)
                 # cv2.drawContours(img_copy, np.array[(right_hip, right_knee)], 0, (255,255,255), 2)
-            
+
+    keypoints = all_keypoints[person_id, ...]
+    scores = all_scores[person_id, ...]
+    right_hip = getKeypoint(keypoints, scores, 'right_hip', keypoint_threshold)
+    right_shoulder = getKeypoint(keypoints, scores, 'right_shoulder', keypoint_threshold)
+    right_knee = getKeypoint(keypoints, scores, 'right_knee', keypoint_threshold)
+
+    left_hip = getKeypoint(keypoints, scores, 'left_hip', keypoint_threshold)
+    left_shoulder = getKeypoint(keypoints, scores, 'left_shoulder', keypoint_threshold)
+    left_knee = getKeypoint(keypoints, scores, 'left_knee', keypoint_threshold)
+    
+    # cv2.line(img_copy, (getMedia(right_hip[0], left_hip[0]),getMedia(right_hip[1], left_hip[1])), (getMedia(right_shoulder[0], left_shoulder[0]),getMedia(right_shoulder[1], left_shoulder[1])), (255,255,255), 2)
+    cv2.line(img_copy, (int(getMedia(right_hip[0], left_hip[0])), int(getMedia(right_hip[1], left_hip[1]))), (int(getMedia(right_shoulder[0], left_shoulder[0])),int(getMedia(right_shoulder[1], left_shoulder[1]))), (255,255,255), 3)
+    cv2.line(img_copy, (int(getMedia(right_hip[0], left_hip[0])), int(getMedia(right_hip[1], left_hip[1]))), (int(getMedia(right_knee[0], left_knee[0])),int(getMedia(right_knee[1], left_knee[1]))), (255,255,255), 3)
+    cv2.line(img_copy, (int(getMedia(right_shoulder[0], left_shoulder[0])), int(getMedia(right_shoulder[1], left_shoulder[1]))), (int(getMedia(right_knee[0], left_knee[0])),int(getMedia(right_knee[1], left_knee[1]))), (255,255,255), 3)
     return img_copy
 
 def calcular_angulos(img, hx, hy, sx, sy, kx, ky):
@@ -103,7 +117,7 @@ def get_pose_estimated(img, all_keypoints, all_scores, confs, keypoint_threshold
         # right_shoulder = getKeypoint(keypoints, scores, 'right_shoulder', keypoint_threshold)
         # right_knee = getKeypoint(keypoints, scores, 'right_knee', keypoint_threshold)
         # print(calcular_angulos(img, right_hip[0], right_hip[1], right_shoulder[0], right_shoulder[1], right_knee[0], right_knee[1]))
-        
+
         # print("Left:")
         # left_hip = getKeypoint(keypoints, scores, 'left_hip', keypoint_threshold)
         # left_shoulder = getKeypoint(keypoints, scores, 'left_shoulder', keypoint_threshold)

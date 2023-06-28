@@ -13,7 +13,7 @@ yolov5_dir = Path("./yolov5")
 
 # Load the YOLOv5 model for object detection
 model = torch.hub.load(str(yolov5_dir), "custom", path=str(yolov5_dir / "yolov5s.pt"), source="local")
-model.conf = 0.6
+model.conf = 0.4
 
 # Set the device (CPU or GPU)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -28,12 +28,8 @@ model_pose_estimation.eval()
 # getPersonPosition(img, model_pose_estimation)
 # cv2.waitKey(500)
 
-
-cv2.namedWindow('croped', cv2.WINDOW_NORMAL)
-cv2.namedWindow('yolo_output', cv2.WINDOW_NORMAL)
-
 # Load the video
-video = cv2.VideoCapture("./images/video_test.mp4")
+video = cv2.VideoCapture("./images/video_test4.mp4")
 frame_count = 0
 while True:
     ret, frame = video.read()
@@ -47,10 +43,11 @@ while True:
 
     # Process area in the image with a person
     interestArea = getImageInterestArea(frame, results)
-    position = getPersonPosition(frame, model_pose_estimation)
-    
-    # if  interestArea[0] != None:
-    #     position = getPersonPosition(interestArea[0], model_pose_estimation)
+
+    if (interestArea != None and (interestArea[0]).all() != None):
+        cv2.imshow("region_of_interest", interestArea[0])
+        print(interestArea[1])
+        position = getPersonPosition(interestArea[0], model_pose_estimation)
         
     
     # Display the results
